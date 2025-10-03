@@ -1,0 +1,162 @@
+/* Genel Ayarlar ve Font */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* Daha canlı bir arka plan */
+    background: linear-gradient(135deg, #17a2b8 0%, #007bff 100%); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Ana Konteyner */
+.login-container {
+    padding: 20px;
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Giriş Kartı */
+.login-card {
+    background-color: #ffffff;
+    border-radius: 15px; /* Daha yuvarlak köşeler */
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); /* Daha belirgin gölge */
+    text-align: center;
+}
+
+/* Başlık ve İkon */
+.header {
+    margin-bottom: 35px;
+}
+
+.icon-large {
+    font-size: 3.5rem;
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+.login-card h2 {
+    color: #343a40;
+    margin: 10px 0 5px 0;
+    font-weight: 700;
+}
+
+.login-card p {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Giriş Grupları (Inputlar) */
+.input-group {
+    display: flex;
+    align-items: center;
+    border: 2px solid #e9ecef; /* Hafif sınır */
+    border-radius: 10px;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    transition: all 0.3s;
+}
+
+.input-group:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15); /* Hafif dış ışık efekti */
+}
+
+.input-group i {
+    color: #495057;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.input-group input {
+    border: none;
+    outline: none;
+    flex-grow: 1;
+    font-size: 1rem;
+    padding: 5px 0;
+    color: #343a40;
+}
+
+/* Aksiyonlar (Hatırla ve Şifre) */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    color: #495057;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    margin-right: 6px;
+    accent-color: #007bff;
+    width: 16px;
+    height: 16px;
+}
+
+.forgot-password {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Giriş Butonu */
+.login-btn {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-btn i {
+    font-size: 1.1rem;
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.login-btn:active {
+    background-color: #004085;
+}
+
+/* Kayıt Ol Linki */
+.register-link {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.register-link a {
+    color: #17a2b8; /* Farklı bir mavi tonu */
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}

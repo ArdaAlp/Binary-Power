@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paycell Kampüs Cüzdanı</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <style>
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            margin-left: 15px;
+            padding: 8px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Modal Stilleri */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--dark);
+            font-size: 1.5rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 5px;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--dark);
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-wallet"></i>
+                    Paycell Kampüs Cüzdanı
+                </div>
+                <div class="user-info">
+                    <div class="avatar">{{ user_name[:2].upper() }}</div>
+                    <div>
+                        <div class="user-name">{{ user_name }}</div>
+                        <div class="user-status">Öğrenci</div>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Çıkış Yap
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <div class="container">
+        <!-- Bakiye Kartı -->
+        <div class="balance-card">
+            <div class="balance-label">Toplam Bakiye</div>
+            <div class="balance-amount">₺{{ "%.2f"|format(balance) }}</div>
+            <div class="balance-actions">
+                <button class="btn btn-primary" id="topup-btn">
+                    <i class="fas fa-plus"></i> Para Yükle
+                </button>
+                <a href="{{ url_for('send_money') }}" class="btn btn-outline" id="send-btn">
+                    <i class="fas fa-paper-plane"></i> Para Gönder
+                </a>
+            </div>
+        </div>
+
+        <!-- Hızlı İşlemler -->
+        <div class="quick-actions">
+            <a href="qr-payment.html" class="action-card" data-action="qr">
+                <div class="action-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <div class="action-title">QR Ödeme</div>
+                <div class="action-desc">Hızlı ödeme yap</div>
+            </a>
+            <a href="split-payment.html" class="action-card" data-action="split">
+                <div class="action-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <div class="action-title">Bölüş</div>
+                <div class="action-desc">Harcamayı paylaş</div>
+            </a>
+            <div class="action-card" data-action="budget">
+                <div class="action-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="action-title">Bütçe</div>
+                <div class="action-desc">Harcamaları yönet</div>
+            </div>
+            <div class="action-card" data-action="cashback">
+                <div class="action-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="action-title">Cashback</div>
+                <div class="action-desc">Kazançları gör</div>
+            </div>
+        </div>
+
+        <!-- İçerik Grid -->
+        <div class="content-grid">
+            <!-- Sol Kolon -->
+            <div class="left-column">
+                <!-- Son İşlemler -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Son İşlemler</div>
+                        <a href="#" class="card-link">Tümünü Gör</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-coffee"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Kampüs Kafe</h4>
+                                    <p>10 Kas 2023, 14:30</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount negative">-₺42.50</div>
+                        </div>
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Kampüs Market</h4>
+                                    <p>9 Kas 2023, 18:15</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount negative">-₺87.25</div>
+                        </div>
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-gift"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Cashback</h4>
+                                    <p>9 Kas 2023, 18:15</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount positive">+₺4.36</div>
+                        </div>
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Mehmet Yılmaz</h4>
+                                    <p>8 Kas 2023, 20:45</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount positive">+₺50.00</div>
+                        </div>
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Yemekhane</h4>
+                                    <p>7 Kas 2023, 12:30</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount negative">-₺25.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bölüşüm Talepleri -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Bölüşüm Talepleri</div>
+                        <a href="#" class="card-link">Tümü</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="split-request">
+                            <div class="split-info">
+                                <div class="split-from">
+                                    <div class="split-avatar">MY</div>
+                                    <div class="split-details">
+                                        <h4>Mehmet Yılmaz</h4>
+                                        <p>Kampüs Kafe - ₺42.50</p>
+                                    </div>
+                                </div>
+                                <div class="split-amount">₺21.25</div>
+                            </div>
+                            <div class="split-actions">
+                                <button class="btn btn-primary btn-sm split-pay">Öde</button>
+                                <button class="btn btn-outline btn-sm split-reject">Reddet</button>
+                            </div>
+                        </div>
+                        <div class="split-request">
+                            <div class="split-info">
+                                <div class="split-from">
+                                    <div class="split-avatar">AE</div>
+                                    <div class="split-details">
+                                        <h4>Ayşe Erdem</h4>
+                                        <p>Sinema - ₺120.00</p>
+                                    </div>
+                                </div>
+                                <div class="split-amount">₺40.00</div>
+                            </div>
+                            <div class="split-actions">
+                                <button class="btn btn-primary btn-sm split-pay">Öde</button>
+                                <button class="btn btn-outline btn-sm split-reject">Reddet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Kolon -->
+            <div class="sidebar">
+                <!-- Bütçe Takibi -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Bütçe Takibi</div>
+                        <a href="#" class="card-link">Düzenle</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-category">Kafe</div>
+                                <div class="budget-amount">₺210 / ₺250</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-warning" style="width: 84%"></div>
+                            </div>
+                            <div class="budget-status">
+                                <span>%84 kullanıldı</span>
+                                <span class="warning">Uyarı!</span>
+                            </div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-category">Market</div>
+                                <div class="budget-amount">₺320 / ₺500</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-safe" style="width: 64%"></div>
+                            </div>
+                            <div class="budget-status">
+                                <span>%64 kullanıldı</span>
+                                <span>İyi</span>
+                            </div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-category">Ulaşım</div>
+                                <div class="budget-amount">₺75 / ₺150</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-safe" style="width: 50%"></div>
+                            </div>
+                            <div class="budget-status">
+                                <span>%50 kullanıldı</span>
+                                <span>İyi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kampanyalar -->
+                <div class="promo-card">
+                    <div class="promo-title">Özel Kampanya!</div>
+                    <div class="promo-desc">İlk QR ödemenizde ₺20 cashback kazanın. Hemen deneyin!</div>
+                    <button class="promo-btn" id="promo-join">Katıl</button>
+                </div>
+
+                <!-- Para Yükleme Modal -->
+                <div id="topup-modal" class="modal">
+                    <div class="modal-content">
+                        <button class="close-modal" onclick="closeTopUpModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="modal-header">
+                            <h2>Para Yükle</h2>
+                        </div>
+                        <form id="topup-form" class="modal-form" onsubmit="handleTopUp(event)">
+                            <div class="form-group">
+                                <label for="amount">Yüklenecek Tutar (TL)</label>
+                                <input type="number" id="amount" name="amount" step="0.01" min="0" required>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-outline" onclick="closeTopUpModal()">İptal</button>
+                                <button type="submit" class="btn btn-primary">Yükle</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cashback Kazançları -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Cashback Kazançları</div>
+                        <a href="#" class="card-link">Detay</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="cashback-item">
+                            <div class="cashback-info">
+                                <div class="cashback-icon">
+                                    <i class="fas fa-coffee"></i>
+                                </div>
+                                <div class="cashback-details">
+                                    <h4>Kafe Cashback</h4>
+                                    <p>%5 iade</p>
+                                </div>
+                            </div>
+                                                        <div class="cashback-amount">₺15.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal İşlemleri
+        function openTopUpModal() {
+            document.getElementById('topup-modal').classList.add('active');
+            document.getElementById('amount').focus();
+        }
+
+        function closeTopUpModal() {
+            document.getElementById('topup-modal').classList.remove('active');
+            document.getElementById('topup-form').reset();
+        }
+
+        // Para Yükleme İşlemi
+        async function handleTopUp(event) {
+            event.preventDefault();
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            try {
+                const response = await fetch('/api/topup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ amount })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Bakiyeyi güncelle
+                    document.querySelector('.balance-amount').textContent = '₺' + result.new_balance.toFixed(2);
+                    
+                    // Modal'ı kapat
+                    closeTopUpModal();
+
+                    // Başarı mesajı göster
+                    alert('Para yükleme işlemi başarılı!');
+                } else {
+                    throw new Error(result.detail || 'Para yükleme işlemi başarısız.');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Event Listener'ları
+        document.getElementById('topup-btn').addEventListener('click', openTopUpModal);
+
+        // Modal dışı tıklamada kapatma
+        document.getElementById('topup-modal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeTopUpModal();
+            }
+        });
+
+        // ESC tuşu ile kapatma
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('topup-modal').classList.contains('active')) {
+                closeTopUpModal();
+            }
+        });
+    </script>
+</body>
+</html>
+                        </div>
+                        <div class="cashback-item">
+                            <div class="cashback-info">
+                                <div class="cashback-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="cashback-details">
+                                    <h4>İlk Ödeme Bonusu</h4>
+                                    <p>Tek seferlik</p>
+                                </div>
+                            </div>
+                            <div class="cashback-amount">+₺20.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arkadaşlar -->
+                <div class="card friends-list">
+                    <div class="card-header">
+                        <div class="card-title">Sık Transferler</div>
+                        <a href="#" class="card-link">Tümü</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="friend-item">
+                            <div class="friend-avatar">MY</div>
+                            <div class="friend-name">Mehmet Yılmaz</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-avatar">AE</div>
+                            <div class="friend-name">Ayşe Erdem</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-avatar">CY</div>
+                            <div class="friend-name">Can Yılmaz</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-title">Paycell Kampüs</div>
+                    <ul class="footer-links">
+                        <li><a href="#">Hakkımızda</a></li>
+                        <li><a href="#">Kampanyalar</a></li>
+                        <li><a href="#">İş Ortakları</a></li>
+                        <li><a href="#">Kariyer</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <div class="footer-title">Yardım</div>
+                    <ul class="footer-links">
+                        <li><a href="#">SSS</a></li>
+                        <li><a href="#">Güvenlik</a></li>
+                        <li><a href="#">İletişim</a></li>
+                        <li><a href="#">Şikayet & Öneri</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <div class="footer-title">Yasal</div>
+                    <ul class="footer-links">
+                        <li><a href="#">Kullanım Koşulları</a></li>
+                        <li><a href="#">Gizlilik Politikası</a></li>
+                        <li><a href="#">Çerez Politikası</a></li>
+                        <li><a href="#">KVKK Aydınlatma Metni</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 Paycell Kampüs Cüzdanı. Tüm hakları saklıdır.
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>+

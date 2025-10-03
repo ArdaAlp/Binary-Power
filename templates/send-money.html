@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Gönder - Paycell Kampüs Cüzdanı</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+    <style>
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            margin-left: 15px;
+            padding: 8px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .send-money-container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .send-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .send-header h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .send-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.1);
+        }
+
+        .send-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .send-actions button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1rem;
+        }
+
+        .balance-info {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            color: var(--dark);
+            font-weight: 500;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            transform: translateX(-3px);
+        }
+
+        @media (max-width: 576px) {
+            .send-money-container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .send-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <a href="{{ url_for('dashboard') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-wallet"></i>
+                    Paycell Kampüs Cüzdanı
+                </div>
+                <div class="user-info">
+                    <div class="avatar">{{ user_name[:2].upper() }}</div>
+                    <div>
+                        <div class="user-name">{{ user_name }}</div>
+                        <div class="user-status">Öğrenci</div>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Çıkış Yap
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Para Gönderme Formu -->
+    <div class="send-money-container">
+        <div class="send-header">
+            <h1>Para Gönder</h1>
+            <p>Gönderim bilgilerini girin</p>
+        </div>
+        <form class="send-form" id="transferForm">
+            <div class="input-group">
+                <label for="userId">Kullanıcı ID</label>
+                <input type="number" id="userId" name="userId" placeholder="Alıcının kullanıcı ID'sini girin" required min="1">
+            </div>
+            <div class="input-group">
+                <label for="amount">Ödenecek Tutar</label>
+                <input type="number" id="amount" name="amount" placeholder="₺0.00" required step="0.01" min="0.01">
+            </div>
+            <div class="input-group">
+                <div class="balance-info">
+                    Mevcut Bakiye: ₺{{ "%.2f"|format(balance) }}
+                </div>
+            </div>
+            <div class="send-actions">
+                <button type="button" class="btn btn-outline" onclick="window.location.href='{{ url_for('dashboard') }}'">
+                    <i class="fas fa-times"></i> İptal Et
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Onayla
+                </button>
+            </div>
+        </form>
+
+        <script>
+            document.getElementById('transferForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const userId = document.getElementById('userId').value;
+                const amount = document.getElementById('amount').value;
+                
+                try {
+                    const response = await fetch('/api/transfer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            to_user_id: parseInt(userId),
+                            amount: parseFloat(amount)
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.detail || 'Transfer başarısız');
+                    }
+                    
+                    alert('Transfer başarılı!');
+                    window.location.href = '{{ url_for('dashboard') }}';
+                    
+                } catch (error) {
+                    alert('Hata: ' + error.message);
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
