@@ -1,3 +1,5 @@
+# *Proje Henüz Tamamlanmamıştır.*
+
 # Binary-Power
 
 💳 Paycell Kampüs Cüzdanı Simülasyonu
