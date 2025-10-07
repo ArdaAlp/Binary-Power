@@ -2,7 +2,7 @@
 
 💳 Paycell Kampüs Cüzdanı Simülasyonu
 Codenight Case: QR Ödeme, Bölüş, Bütçe ve Cashback
-Bu depo, bir Codenight Case etkinliği kapsamında, Paycell benzeri bir dijital cüzdan deneyimini simüle etmek için geliştirilmiştir. Proje, özellikle bir kampüs senaryosundaki günlük harcamaları yönetmeyi kolaylaştıran temel finansal akışlara odaklanmıştır.
+Bu proje, bir Codenight Case etkinliği kapsamında, Paycell benzeri bir dijital cüzdan deneyimini simüle etmek için geliştirilmiştir. Proje, özellikle bir kampüs senaryosundaki günlük harcamaları yönetmeyi kolaylaştıran temel finansal akışlara odaklanmıştır.
 
 ✨ Temel Özellikler (MVP)
 Bu mini-uygulama, 6-8 saatlik süre içinde geliştirilmesi gereken beş temel alan aşağıdaki gibidir:
@@ -17,8 +17,6 @@ Bütçe/Limit Takibi: Kullanıcının aylık kategori bazında bütçe tanımlam
 Cashback: Basit kampanya kurallarına göre iade hesaplama ve cüzdana yansıtma ("Kafe kategorisinde %5 iade", "İlk QR ödeme 20 TL iade").
 
 🛠️ Teknik Detaylar
-Mimari ve Akış
-Uygulama, Paycell benzeri akışı 
-mock API'ler ve sahte verilerle (CSV tohumları) canlandırır.
+mock API'ler ve sahte verilerle (CSV tohumları) sistem işler.
 Bu aplikasyonda FastAPI, SQLLite3 teknolojileri kullanılmıştır
 Sistemi test etmek amacıyla swagger teknolojisi kullanılmıştır.
